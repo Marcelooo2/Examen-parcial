@@ -1,12 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
-
 import sqlite3
-import os
 
 app = Flask(__name__)
 app.secret_key = 'clave_secreta_2024'
-CORS(app, origins=["https://tu-proyecto.vercel.app"])
+CORS(app, supports_credentials=True, origins=["https://tu-proyecto.vercel.app"])
 
 DB = 'database.db'
 
@@ -15,60 +13,38 @@ def init_db():
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL,
-        password TEXT NOT NULL,
-        nombre TEXT NOT NULL
-    )''')
+        username TEXT, password TEXT, nombre TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS productos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        codigo TEXT UNIQUE NOT NULL,
-        nombre TEXT NOT NULL,
-        descripcion TEXT,
-        precio REAL,
-        stock INTEGER,
-        categoria TEXT
-    )''')
-    c.execute("INSERT OR IGNORE INTO usuarios (username, password, nombre) VALUES ('admin','1234','Administrador')")
-    c.execute("INSERT OR IGNORE INTO productos VALUES (NULL,'P001','Laptop HP','Laptop 15 pulgadas Intel Core i5',2500.00,10,'Tecnología')")
-    c.execute("INSERT OR IGNORE INTO productos VALUES (NULL,'P002','Mouse Logitech','Mouse inalámbrico ergonómico',89.90,50,'Periféricos')")
-    c.execute("INSERT OR IGNORE INTO productos VALUES (NULL,'P003','Teclado Mecánico','Teclado mecánico RGB switches blue',199.90,25,'Periféricos')")
+        codigo TEXT UNIQUE, nombre TEXT,
+        descripcion TEXT, precio REAL, stock INTEGER, categoria TEXT)''')
+    c.execute("INSERT OR IGNORE INTO usuarios VALUES (NULL,'admin','1234','Administrador')")
+    c.execute("INSERT OR IGNORE INTO productos VALUES (NULL,'P001','Laptop HP','Laptop i5 15 pulgadas',2500.00,10,'Tecnología')")
+    c.execute("INSERT OR IGNORE INTO productos VALUES (NULL,'P002','Mouse Logitech','Mouse inalámbrico',89.90,50,'Periféricos')")
+    c.execute("INSERT OR IGNORE INTO productos VALUES (NULL,'P003','Teclado Mecánico','Teclado RGB switches blue',199.90,25,'Periféricos')")
     conn.commit()
     conn.close()
 
-@app.route('/')
-def index():
-    return redirect(url_for('login'))
-
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/api/login', methods=['POST'])
 def login():
-    error = None
-    if request.method == 'POST':
-        user = request.form['username']
-        pwd  = request.form['password']
-        conn = sqlite3.connect(DB)
-        c = conn.cursor()
-        c.execute("SELECT * FROM usuarios WHERE username=? AND password=?", (user, pwd))
-        row = c.fetchone()
-        conn.close()
-        if row:
-            session['usuario'] = row[1]
-            session['nombre']   = row[3]
-            return redirect(url_for('principal'))
-        else:
-            error = 'Usuario o contraseña incorrectos'
-    return render_template('login.html', error=error)
+    data = request.json
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+    c.execute("SELECT * FROM usuarios WHERE username=? AND password=?",
+              (data['username'], data['password']))
+    row = c.fetchone()
+    conn.close()
+    if row:
+        session['usuario'] = row[1]
+        session['nombre']  = row[3]
+        return jsonify({'ok': True, 'nombre': row[3]})
+    return jsonify({'ok': False, 'error': 'Credenciales incorrectas'})
 
-@app.route('/principal')
-def principal():
-    if 'usuario' not in session:
-        return redirect(url_for('login'))
-    return render_template('principal.html', nombre=session['nombre'])
-
-@app.route('/buscador')
-def buscador():
-    if 'usuario' not in session:
-        return redirect(url_for('login'))
-    return render_template('buscador.html')
+@app.route('/api/session')
+def check_session():
+    if 'usuario' in session:
+        return jsonify({'ok': True, 'nombre': session['nombre']})
+    return jsonify({'ok': False})
 
 @app.route('/api/buscar_producto', methods=['POST'])
 def buscar_producto():
@@ -84,10 +60,10 @@ def buscar_producto():
                         'stock': row[5], 'categoria': row[6]})
     return jsonify({'encontrado': False})
 
-@app.route('/logout')
+@app.route('/api/logout', methods=['POST'])
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+    return jsonify({'ok': True})
 
 if __name__ == '__main__':
     init_db()
