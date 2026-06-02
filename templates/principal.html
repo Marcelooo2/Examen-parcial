@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Principal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f0f2f5; font-family: Arial, sans-serif; }
+        header { background: #4361ee; color: white; padding: 20px 40px;
+                 display: flex; justify-content: space-between; align-items: center; }
+        header h1 { font-size: 22px; }
+        .main { display: flex; justify-content: center; align-items: center;
+                min-height: 80vh; }
+        .card { background: white; padding: 50px; border-radius: 12px;
+                text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 400px; }
+        .card h2 { color: #1a1a2e; margin-bottom: 10px; }
+        .card p  { color: #777; margin-bottom: 30px; }
+        .btn { display: inline-block; padding: 14px 28px; border-radius: 8px;
+               text-decoration: none; font-size: 16px; margin: 8px; cursor: pointer;
+               border: none; }
+        .btn-primary { background: #4361ee; color: white; }
+        .btn-danger  { background: #e63946; color: white; }
+        .btn:hover { opacity: 0.85; }
+    </style>
+</head>
+<body>
+<header>
+    <h1> Panel Principal</h1>
+    <span>{{ nombre }}</span>
+</header>
+<div class="main">
+    <div class="card">
+        <h2>¡Bienvenido, {{ nombre }}!</h2>
+        <p>Selecciona una opción del sistema</p>
+        <a href="/buscador" class="btn btn-primary">🔍 Buscar Producto</a><br>
+        <a href="/logout"   class="btn btn-danger">🚪 Salir del Sistema</a>
+    </div>
+</div>
+</body>
+</html>
