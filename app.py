@@ -1,10 +1,10 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, render_template, redirect, url_for
 from flask_cors import CORS
 import sqlite3
 
 app = Flask(__name__)
 app.secret_key = 'clave_secreta_2024'
-CORS(app, supports_credentials=True, origins=["https://tu-proyecto.vercel.app"])
+CORS(app, supports_credentials=True)
 
 DB = 'database.db'
 
@@ -25,27 +25,51 @@ def init_db():
     conn.commit()
     conn.close()
 
-@app.route('/api/login', methods=['POST'])
+# ← init_db() AQUÍ, fuera del if __name__
+init_db()
+
+# ── Rutas HTML ──────────────────────────────
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    data = request.json
-    conn = sqlite3.connect(DB)
-    c = conn.cursor()
-    c.execute("SELECT * FROM usuarios WHERE username=? AND password=?",
-              (data['username'], data['password']))
-    row = c.fetchone()
-    conn.close()
-    if row:
-        session['usuario'] = row[1]
-        session['nombre']  = row[3]
-        return jsonify({'ok': True, 'nombre': row[3]})
-    return jsonify({'ok': False, 'error': 'Credenciales incorrectas'})
+    error = None
+    if request.method == 'POST':
+        user = request.form['username']
+        pwd  = request.form['password']
+        conn = sqlite3.connect(DB)
+        c = conn.cursor()
+        c.execute("SELECT * FROM usuarios WHERE username=? AND password=?", (user, pwd))
+        row = c.fetchone()
+        conn.close()
+        if row:
+            session['usuario'] = row[1]
+            session['nombre']  = row[3]
+            return redirect(url_for('principal'))
+        else:
+            error = 'Usuario o contraseña incorrectos'
+    return render_template('login.html', error=error)
 
-@app.route('/api/session')
-def check_session():
-    if 'usuario' in session:
-        return jsonify({'ok': True, 'nombre': session['nombre']})
-    return jsonify({'ok': False})
+@app.route('/principal')
+def principal():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    return render_template('principal.html', nombre=session['nombre'])
 
+@app.route('/buscador')
+def buscador():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    return render_template('buscador.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
+# ── Rutas API ───────────────────────────────
 @app.route('/api/buscar_producto', methods=['POST'])
 def buscar_producto():
     codigo = request.json.get('codigo', '').upper()
@@ -60,11 +84,5 @@ def buscar_producto():
                         'stock': row[5], 'categoria': row[6]})
     return jsonify({'encontrado': False})
 
-@app.route('/api/logout', methods=['POST'])
-def logout():
-    session.clear()
-    return jsonify({'ok': True})
-
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)
