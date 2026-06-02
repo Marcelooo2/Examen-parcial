@@ -5,27 +5,27 @@
     <title>Buscador de Productos</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #07080a; font-family: Arial, sans-serif; }
-        header { background: #ffffff; color: white; padding: 20px 40px; }
+        body { background: #f8f9fa; font-family: Arial, sans-serif; }
+        header { background: #007bff; color: white; padding: 20px 40px; }
         .main { display: flex; justify-content: center; padding: 40px 20px; }
-        .card { background: white; padding: 40px; border-radius: 12px;
-                width: 500px; box-shadow: 0 4px 20px rgba(255, 254, 254, 0.1); }
-        h2 { color: #8d8d8d; margin-bottom: 25px; }
+        .card { background: white; padding: 40px; border-radius: 10px;
+                width: 500px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+        h2 { color: black; margin-bottom: 25px; }
         .search-box { display: flex; gap: 10px; margin-bottom: 25px; }
-        input { flex: 1; padding: 10px 14px; border: 1px solid #ddd;
+        input { flex: 1; padding: 10px 14px; border: 1px solid #ccc;
                 border-radius: 6px; font-size: 15px; }
         .btn { padding: 10px 20px; border: none; border-radius: 6px;
                cursor: pointer; font-size: 15px; }
-        .btn-primary { background: #ffffff; color: white; }
+        .btn-primary { background: #007bff; color: white; }
         .btn-secondary { background: #6c757d; color: white; }
-        .btn-danger    { background: #d14b4b; color: white; }
-        .resultado { background: #f8f9fa; border-radius: 8px; padding: 20px;
-                     border-left: 4px solid #ffffff; margin-bottom: 20px; }
-        .resultado h3 { color: #ffffff; margin-bottom: 12px; }
+        .btn-danger { background: #dc3545; color: white; }
+        .resultado { background: #f1f1f1; border-radius: 8px; padding: 20px;
+                     border: 1px solid #ccc; margin-bottom: 20px; }
+        .resultado h3 { color: black; margin-bottom: 12px; }
         .dato { display: flex; justify-content: space-between;
-                padding: 6px 0; border-bottom: 1px solid #eee; font-size: 14px; }
-        .precio { color: #2ecc71; font-weight: bold; font-size: 18px; }
-        .no-encontrado { color: #fafafa; text-align: center; padding: 20px; }
+                padding: 6px 0; border-bottom: 1px solid #ddd; font-size: 14px; }
+        .precio { color: green; font-weight: bold; font-size: 18px; }
+        .no-encontrado { color: red; text-align: center; padding: 20px; }
         #resultado { display: none; }
         .acciones { display: flex; gap: 10px; margin-top: 15px; }
     </style>
@@ -36,7 +36,7 @@
     <div class="card">
         <h2>Buscar por Código</h2>
         <div class="search-box">
-            <input type="text" id="codigo" placeholder="Ej: P001, P002, P003" 
+            <input type="text" id="codigo" placeholder="Ej: P001, P002, P003"
                    onkeypress="if(event.key==='Enter') buscar()">
             <button class="btn btn-primary" onclick="buscar()">Buscar</button>
         </div>
@@ -44,8 +44,8 @@
         <div id="resultado"></div>
 
         <div class="acciones">
-            <a href="/principal" class="btn btn-secondary">⬅ Regresar</a>
-            <a href="/logout"    class="btn btn-danger">Salir del Sistema</a>
+            <a href="/principal" class="btn btn-secondary">Regresar</a>
+            <a href="/logout" class="btn btn-danger">Salir del Sistema</a>
         </div>
     </div>
 </div>
@@ -55,13 +55,14 @@ async function buscar() {
     const codigo = document.getElementById('codigo').value.trim();
     if (!codigo) { alert('Ingrese un código de producto'); return; }
 
-    const res  = await fetch('/api/buscar_producto', {
+    const res = await fetch('/api/buscar_producto', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ codigo })
     });
+
     const data = await res.json();
-    const div  = document.getElementById('resultado');
+    const div = document.getElementById('resultado');
     div.style.display = 'block';
 
     if (data.encontrado) {
@@ -75,7 +76,7 @@ async function buscar() {
                 <div class="dato"><span>Precio:</span> <span class="precio">S/ ${data.precio.toFixed(2)}</span></div>
             </div>`;
     } else {
-        div.innerHTML = `<div class="no-encontrado"> Producto no encontrado. Intente con P001, P002 o P003.</div>`;
+        div.innerHTML = `<div class="no-encontrado">Producto no encontrado. Intente con P001, P002 o P003.</div>`;
     }
 }
 </script>

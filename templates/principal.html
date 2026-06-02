@@ -5,35 +5,35 @@
     <title>Panel Principal</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0063f8; font-family: Arial, sans-serif; }
-        header { background: #f4f4f4; color: rgb(250, 10, 10); padding: 20px 40px;
+        body { background: #e9ecef; font-family: Arial, sans-serif; }
+        header { background: #007bff; color: white; padding: 20px 40px;
                  display: flex; justify-content: space-between; align-items: center; }
         header h1 { font-size: 22px; }
         .main { display: flex; justify-content: center; align-items: center;
                 min-height: 80vh; }
-        .card { background: white; padding: 50px; border-radius: 12px;
-                text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 400px; }
-        .card h2 { color: #1a1a2e; margin-bottom: 10px; }
-        .card p  { color: #777; margin-bottom: 30px; }
-        .btn { display: inline-block; padding: 14px 28px; border-radius: 8px;
+        .card { background: white; padding: 50px; border-radius: 10px;
+                text-align: center; box-shadow: 0 0 10px rgba(0,0,0,0.2); width: 400px; }
+        .card h2 { color: black; margin-bottom: 10px; }
+        .card p  { color: #555; margin-bottom: 30px; }
+        .btn { display: inline-block; padding: 14px 28px; border-radius: 6px;
                text-decoration: none; font-size: 16px; margin: 8px; cursor: pointer;
                border: none; }
-        .btn-primary { background: #ffffff; color: rgb(91, 55, 55); }
-        .btn-danger  { background: #a45d5d; color: white; }
+        .btn-primary { background: #28a745; color: white; }
+        .btn-danger  { background: #dc3545; color: white; }
         .btn:hover { opacity: 0.85; }
     </style>
 </head>
 <body>
 <header>
-    <h1> Panel Principal</h1>
+    <h1>Panel Principal</h1>
     <span>{{ nombre }}</span>
 </header>
 <div class="main">
     <div class="card">
         <h2>¡Bienvenido, {{ nombre }}!</h2>
         <p>Selecciona una opción del sistema</p>
-        <a href="/buscador" class="btn btn-primary"> Buscar Producto</a><br>
-        <a href="/logout"   class="btn btn-danger"> Salir del Sistema</a>
+        <a href="/buscador" class="btn btn-primary">Buscar Producto</a><br>
+        <a href="/logout" class="btn btn-danger">Salir del Sistema</a>
     </div>
 </div>
 </body>
